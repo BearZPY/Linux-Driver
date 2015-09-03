@@ -10,11 +10,12 @@
 ----
 ####工程目录
 1.first_drv  最简单的驱动
+
 2.module_param insmod 传递参数
 
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
-* 2.module_param insmod
+* 2015.9.2 添加 2.module_param 
 
 
 
