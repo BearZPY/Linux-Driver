@@ -1,9 +1,0 @@
-make -C /home/bear/workspace/s3c-linux.jyx M=`pwd` modules 
-make[1]: Entering directory `/home/bear/workspace/s3c-linux.jyx'
-  CC [M]  /home/bear/workspace/driver/first_drv/first_drv.o
-  Building modules, stage 2.
-  MODPOST 1 modules
-  LD [M]  /home/bear/workspace/driver/first_drv/first_drv.ko
-make[1]: Leaving directory `/home/bear/workspace/s3c-linux.jyx'
-install -m 755  ./first_drv.ko ./bin
-install -m 755  ./first_drv.ko /nfsroot
