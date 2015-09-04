@@ -1,0 +1,7 @@
+make -C /home/bear/workspace/s3c-linux.jyx M=`pwd` modules 
+make[1]: Entering directory `/home/bear/workspace/s3c-linux.jyx'
+  Building modules, stage 2.
+  MODPOST 1 modules
+make[1]: Leaving directory `/home/bear/workspace/s3c-linux.jyx'
+install -m 755  ./register_chdev.ko ./bin
+install -m 755  ./register_chdev.ko /nfsroot

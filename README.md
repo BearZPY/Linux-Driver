@@ -13,9 +13,12 @@
 
 2.module_param insmod 传递参数
 
+3.register_chdev 注册字符设备号
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
-* 2015.9.2 添加 2.module_param 
+* 2015.9.3 添加 2.module_param 
+* 2015.9.4 添加 3.register_chdev
 
 
 
