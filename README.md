@@ -15,10 +15,14 @@
 
 3.register_chdev 注册字符设备号
 
+4.open_close_dev(old) 不用cdev注册字符设备
+
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
 * 2015.9.4 添加 3.register_chdev
+* 2015.9.5 添加 4.open_close_dev(old)
 
 
 
