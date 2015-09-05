@@ -1,0 +1,10 @@
+make -C /home/bear/workspace/s3c-linux.jyx M=`pwd` modules 
+make[1]: Entering directory `/home/bear/workspace/s3c-linux.jyx'
+  CC [M]  /home/bear/workspace/driver/3.register_major/register_major.o
+  Building modules, stage 2.
+  MODPOST 1 modules
+  CC      /home/bear/workspace/driver/3.register_major/register_major.mod.o
+  LD [M]  /home/bear/workspace/driver/3.register_major/register_major.ko
+make[1]: Leaving directory `/home/bear/workspace/s3c-linux.jyx'
+install -m 755  ./register_major.ko ./bin
+install -m 755  ./register_major.ko /nfsroot

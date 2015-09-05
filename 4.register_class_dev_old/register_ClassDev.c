@@ -12,7 +12,6 @@
 static int chdev_major = 200;// major dev number
 //static int chdev_minor = 0;// minor dev number
 static int chdev_nr_devs = 1;//  
-//static struct cdev *chdev_cdev;
 static struct class *chdev_class;
 static struct device *chdev_device;
 
@@ -49,13 +48,10 @@ static int __init chdev_init(void)
 {
 	int ret;
 	dev_t dev = 0;
-	//int devno;
 
 	printk("chdev init\n");	
 	if(chdev_major)
 	{
-		//dev = MKDEV(chdev_major,chdev_minor);
-		//ret = register_chrdev_region(dev,chdev_nr_devs,"chdev");
 		ret = register_chrdev(chdev_major,"chdev",&chdev_fops); 
 	}
 	else
@@ -69,12 +65,6 @@ static int __init chdev_init(void)
 		goto ERR;			
 	}
 
-/*	chdev_cdev = cdev_alloc();
-	cdev_init(chdev_cdev,&chdev_fops);
-	chdev_cdev->owner = THIS_MODULE;
-	devno = MKDEV(chdev_major,chdev_minor+1);
-	cdev_add (chdev_cdev, devno, 1);
-*/
 	chdev_class = class_create(THIS_MODULE, "chdev");
 	chdev_device = device_create(chdev_class, NULL, MKDEV(chdev_major, 0), NULL, "chdev");
  
@@ -88,14 +78,10 @@ ERR:
 
 static void __exit chdev_exit(void)
 {
-	//dev_t dev = MKDEV(chdev_major,chdev_minor);
 	printk("chdev_exit\n");	
 
 	device_unregister(chdev_device);
 	class_destroy(chdev_class);
-
-	//cdev_del(chdev_cdev);
-	//unregister_chrdev_region(dev,chdev_nr_devs);	
 
 	unregister_chrdev(chdev_major,"chdev");
 }

@@ -2,7 +2,7 @@ KERN_DIR = /home/bear/workspace/s3c-linux.jyx
 
 INSTALL_DIR = ./bin
 EXP_INSTALL = install -m 755 
-EXEC =  ./register_chdev.ko
+EXEC =  ./register_major.ko
 
 all:
 	make -C $(KERN_DIR) M=`pwd` modules 
@@ -12,4 +12,4 @@ clean:
 	make -C $(KERN_DIR) M=`pwd` modules clean
 	rm -rf modules.order *~
 
-obj-m	+= register_chdev.o
+obj-m	+= register_major.o
