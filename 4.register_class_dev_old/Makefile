@@ -2,7 +2,7 @@ KERN_DIR = /home/bear/workspace/s3c-linux.jyx
 
 INSTALL_DIR = ./bin
 EXP_INSTALL = install -m 755 
-EXEC =  ./register_ClassDev.ko
+EXEC =  ./register_class_dev.ko
 CROSS = arm-linux-
 CC = ${CROSS}gcc
 OBJS = test.c
@@ -21,5 +21,5 @@ clean:
 	rm -rf modules.order *~
 	rm -rf *.o $(TESTC)
 
-obj-m	+= register_ClassDev.o
+obj-m	+= register_class_dev.o
 

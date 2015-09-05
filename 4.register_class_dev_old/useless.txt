@@ -1,13 +1,10 @@
 make -C /home/bear/workspace/s3c-linux.jyx M=`pwd` modules 
 make[1]: Entering directory `/home/bear/workspace/s3c-linux.jyx'
-  CC [M]  /home/bear/workspace/driver/4.register_class_dev_old/register_ClassDev.o
   Building modules, stage 2.
   MODPOST 1 modules
-  CC      /home/bear/workspace/driver/4.register_class_dev_old/register_ClassDev.mod.o
-  LD [M]  /home/bear/workspace/driver/4.register_class_dev_old/register_ClassDev.ko
 make[1]: Leaving directory `/home/bear/workspace/s3c-linux.jyx'
-install -m 755  ./register_ClassDev.ko ./bin
-install -m 755  ./register_ClassDev.ko /nfsroot 
+install -m 755  ./register_class_dev.ko ./bin
+install -m 755  ./register_class_dev.ko /nfsroot 
 arm-linux-gcc -o ./test test.c
 install -m 755  ./test ./bin
 install -m 755  ./test /nfsroot 
