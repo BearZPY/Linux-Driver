@@ -24,8 +24,10 @@
 * 2015.9.3 添加 2.module_param 
 * 2015.9.4 添加 3.register_major
 * 2015.9.5 添加 4.open_close_dev(old)
-* 2015.9.5 修改部分目录名称
+* 2015.9.5 修改 部分目录名称
 * 2015.9.5 添加 5.register_class_dev_cdev
+* 2015.9.5 更新 4.register_class_dev_old 
+* 2015.9.5 修改 description
 
 
 ####相关链接及反馈

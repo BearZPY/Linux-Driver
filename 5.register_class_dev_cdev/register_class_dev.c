@@ -139,7 +139,7 @@ module_init(chdev_init);
 module_exit(chdev_exit);
 
 MODULE_AUTHOR("Bear  965006619@qq.com");
-MODULE_DESCRIPTION("4.open close dev");
+MODULE_DESCRIPTION("5.class dev cdev");
 MODULE_LICENSE("GPL");
 
 
