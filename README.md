@@ -17,6 +17,7 @@
 
 4.register_class_dev_old  不用cdev注册类设备
 
+5.register_class_dev_cdev  用cdev注册类设备
 
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
@@ -24,7 +25,7 @@
 * 2015.9.4 添加 3.register_major
 * 2015.9.5 添加 4.open_close_dev(old)
 * 2015.9.5 修改部分目录名称
-
+* 2015.9.5 添加 5.register_class_dev_cdev
 
 
 ####相关链接及反馈
