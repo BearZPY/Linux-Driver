@@ -19,6 +19,8 @@
 
 5.register_class_dev_cdev  用cdev注册类设备
 
+6.read_write_dev  读写字符设备
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -28,7 +30,7 @@
 * 2015.9.5 添加 5.register_class_dev_cdev
 * 2015.9.5 更新 4.register_class_dev_old 
 * 2015.9.5 修改 description
-
+* 2015.9.7 添加 6.read_write_dev
 
 ####相关链接及反馈
 
