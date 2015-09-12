@@ -23,6 +23,7 @@
 
 7.proc_chdev  在/proc 目录下创建chdev文件 可用cat查看
 
+8.mutex_lock 互斥锁
 
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
@@ -35,6 +36,7 @@
 * 2015.9.5 修改 description
 * 2015.9.7 添加 6.read_write_dev
 * 2015.9.8 添加 7.proc_chdev  
+* 2015.9.12 添加 8.mutex_lock 
 
 ####相关链接及反馈
 
