@@ -25,6 +25,8 @@
 
 8.mutex_lock 互斥锁
 
+9.ioctl 互斥锁
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -37,6 +39,7 @@
 * 2015.9.7 添加 6.read_write_dev
 * 2015.9.8 添加 7.proc_chdev  
 * 2015.9.12 添加 8.mutex_lock 
+* 2015.9.13 添加 9.ioctl
 
 ####相关链接及反馈
 
