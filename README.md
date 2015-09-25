@@ -29,6 +29,10 @@
 
 10.led  LED驱动和测试程序
 
+11.minor_device_no 次设备号
+
+12.button 按键驱动
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -43,6 +47,8 @@
 * 2015.9.12 添加 8.mutex_lock 
 * 2015.9.13 添加 9.ioctl
 * 2015.9.20 添加 10.led
+* 2015.9.24 添加 11.minor_device_no
+* 2015.9.25 添加 12.button
 
 ####相关链接及反馈
 
