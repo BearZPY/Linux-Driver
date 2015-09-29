@@ -35,6 +35,8 @@
 
 13.timer 定时器
 
+14.button_debounce 按键消抖
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -52,6 +54,7 @@
 * 2015.9.24 添加 11.minor_device_no
 * 2015.9.25 添加 12.button
 * 2015.9.28 添加 13.timer
+* 2015.9.29 添加 14.button_debounce
 
 ####相关链接及反馈
 
