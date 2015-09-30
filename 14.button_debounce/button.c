@@ -93,6 +93,8 @@ static void button_press_time(unsigned long dat)
 {
 	unsigned int pinval;
     PDEBUG("Timer ID is: %ld\r\n",dat);
+	if(dat == -1)
+		return ;
 	pinval = s3c2410_gpio_getpin(button_pin[dat]); 
 	PDEBUG("pinval: %d\r\n",pinval);
 	if(pinval)
@@ -114,19 +116,22 @@ static irqreturn_t buttons_interrupt(int irq, void *dev_id)
 	PDEBUG("Dev ID is: %d\r\n",*des);
 	button_timer[*des].data = *des;
 	ret = mod_timer(&button_timer[*des],jiffies + (2*HZ/100));
-	if (ret != 1)
-		PDEBUG("mod_timer failed");
+//	if (ret != 1)
+//		PDEBUG("mod_timer failed");
 	return IRQ_RETVAL(IRQ_HANDLED);	
 }
 
 static int button_open(struct inode *inode, struct file *file)
 {
 	int err,i;
-    for (i = 0; i < sizeof(button_irqs)/sizeof(button_irqs[0]); i++) 
+	//s3c2410_gpio_getpin(S3C2410_GPF4_EINT4);
+    PDEBUG("%d\n",sizeof(button_irqs)/sizeof(button_irqs[0])); 
+    for (i = 0;i < sizeof(button_irqs)/sizeof(button_irqs[0]); i++) 
     {
     	init_timer(&button_timer[i]);
 		//button_timer[i].expires = jiffies +(2*HZ/100);
 		button_timer[i].function = button_press_time;
+		button_timer[i].data = -1;
 		add_timer(&button_timer[i]);
         // 注册中断处理函数
         err = request_irq(button_irqs[i].irq, buttons_interrupt, button_irqs[i].flags, 
