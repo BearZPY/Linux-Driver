@@ -48,8 +48,8 @@ static struct cdev *button_cdev;
 static struct class *button_class;
 static struct device *button_device[5];
 static struct timer_list button_timer[5];
-static unsigned int button_pin[5] = {S3C2410_GPF0_EINT0,S3C2410_GPF1_EINT1,
-				S3C2410_GPF2_EINT2,S3C2410_GPF3_EINT3,S3C2410_GPF4_EINT4};
+static unsigned int button_pin[5] = {S3C2410_GPF(0),S3C2410_GPF(1),S3C2410_GPF(2),
+	S3C2410_GPF(3),S3C2410_GPF(4)};
 
 static volatile int key_no[] = {0,1,2,3,4};
 static volatile int key_value[] = {0,0,0,0,0};
