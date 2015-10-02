@@ -37,6 +37,8 @@
 
 14.button_debounce 按键消抖
 
+15.button_long_press 按键长按
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -55,6 +57,7 @@
 * 2015.9.25 添加 12.button
 * 2015.9.28 添加 13.timer
 * 2015.9.29 添加 14.button_debounce
+* 2015.10.2 添加 15.button_long_press
 
 ####相关链接及反馈
 
