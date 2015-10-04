@@ -103,9 +103,9 @@ static int PWM_open(struct inode *inode, struct file *file)
 	//设置TCFG0寄存器，prescaler = 50
 	//Timer input clock Frequency = PCLK / {prescaler value+1} / {divider value}
 	tcfg0 &= ~S3C2410_TCFG_PRESCALER0_MASK; // S3C2410_TCFG_PRESCALER0_MASK 定时器 0 和1 的预分频值的掩码,清除TCFG[0~8]
-    tcfg0 |= (50 - 1); // 设置预分频为 50
+    tcfg0 |= (100 - 1); // 设置预分频为 50
     tcfg0 &= ~S3C2410_TCFG_PRESCALER1_MASK; // S3C2410_TCFG_PRESCALER0_MASK 定时器 2 3 4 的预分频值的掩码,清除TCFG[0~8]
-	tcfg0 |= (50 - 1) << 8; // 设置预分频为 50
+	tcfg0 |= (100 - 1) << 8; // 设置预分频为 50
 
 	tcfg1 &= ~(S3C2410_TCFG1_MUX0_MASK | S3C2410_TCFG1_MUX1_MASK | S3C2410_TCFG1_MUX2_MASK
 				| S3C2410_TCFG1_MUX3_MASK);
@@ -117,9 +117,10 @@ static int PWM_open(struct inode *inode, struct file *file)
 
 	clk_p = clk_get(NULL, "pclk"); //得到 pclk
 	pclk  = clk_get_rate(clk_p);
-	tcnt0 = (pclk/50/16)/10416;
-	tcmp0 = 1;//tcnt0/2; 
-	__raw_writel(tcnt0, S3C2410_TCNTB(0)); __raw_writel(tcmp0, S3C2410_TCMPB(0));
+	PDEBUG("plck %ld \n",pclk);
+	tcnt0 = (pclk/100/16)/1;
+	tcmp0 = tcnt0/2;;//tcnt0/2; 
+	__raw_writel(tcnt0, S3C2410_TCNTB(0)); __raw_writel(tcnt0, S3C2410_TCMPB(0));
 	__raw_writel(tcnt0, S3C2410_TCNTB(1)); __raw_writel(tcmp0, S3C2410_TCMPB(1));
 	__raw_writel(tcnt0, S3C2410_TCNTB(2)); __raw_writel(tcmp0, S3C2410_TCMPB(2));
 	__raw_writel(tcnt0, S3C2410_TCNTB(3)); __raw_writel(tcmp0, S3C2410_TCMPB(3));
