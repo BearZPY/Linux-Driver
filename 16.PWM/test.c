@@ -3,6 +3,8 @@
 #include <sys/stat.h>   
 #include <fcntl.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>  
+#include "pwm.h"
 
 void usage(char *argv[])
 {
@@ -12,7 +14,7 @@ void usage(char *argv[])
 
 int main(int argc,char *argv[])
 {
-	int fd,ret,i;
+	int fd,ret,timer,freq,duty;
     int key_value[5];
 	if(argc != 2)
 	{
@@ -29,22 +31,31 @@ int main(int argc,char *argv[])
 	}	
     while(1)
     {
-		scanf("%d",&i);
-		if(i == 0)
-			break;
-/*      ret = read(fd, key_value, sizeof(key_value));
-        if (ret < 0) {
-            printf("read err!\n");
-            continue;
-        } 
-
-        for (i = 0; i < sizeof(key_value)/sizeof(key_value[0]); i++) {
-            // 如果被按下的次数不为0，打印出来
-            if (key_value[i])
-                printf("K%d has been pressed %d times!\n", i+1, key_value[i]);
+		scanf("%d %d %d",&timer,&freq,&duty);
+        switch(timer)
+        {
+        case 0:
+            printf("case 0:\n");
+            ioctl(fd,PWM_IOC_SET_TIME0_FREQ,freq);
+            ioctl(fd,PWM_IOC_SET_TIME0_DUTY,duty);
+            break;
+        case 1:
+            printf("case 1:\n");
+            ioctl(fd,PWM_IOC_SET_TIME1_FREQ,freq);
+            ioctl(fd,PWM_IOC_SET_TIME1_DUTY,duty);
+            break;
+        case 2:
+            printf("case 2:\n");
+            ioctl(fd,PWM_IOC_SET_TIME2_FREQ,freq);
+            ioctl(fd,PWM_IOC_SET_TIME2_DUTY,duty);
+            break;
+        case 3:
+            printf("case 3:\n");
+            ioctl(fd,PWM_IOC_SET_TIME3_FREQ,freq);
+            ioctl(fd,PWM_IOC_SET_TIME3_DUTY,duty);
+            break;
+        default:break;
         }
-
-*/
     }
     
 	close(fd);	

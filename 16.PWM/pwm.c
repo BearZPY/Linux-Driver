@@ -1,4 +1,4 @@
-#include <linux/init.h>		//module_init
+ï»¿#include <linux/init.h>		//module_init
 #include <linux/module.h>	//MODULE_LICENSE
 #include <linux/moduleparam.h>  //module_param
 #include <linux/fs.h>		//register_chrdev_region	
@@ -29,19 +29,20 @@
 //#include <asm/mach/time.h>
 #include <linux/clk.h>
 
+#include "pwm.h"
 
-#define BUTTON_DEBUG
+#define PWM_DEBUG
 #undef PDEBUG             /* undef it, just in case */
-#ifdef BUTTON_DEBUG
+#ifdef PWM_DEBUG
     #ifdef __KERNEL__
      /* This one if debugging is on, and kernel space */
 	#define PDEBUG(fmt,args...)    printk(KERN_EMERG "PWM: " fmt,## args)
     #else
      /* This one for user space */
-        #define PDEBUG(fmt, argsâ€¦)     fprintf(stderr, fmt, ## args)
+        #define PDEBUG(fmt, argséˆ¥?     fprintf(stderr, fmt, ## args)
     #endif
 #else
-    #define PDEBUG(fmt, argsâ€¦) /* not debugging: nothing */
+    #define PDEBUG(fmt, argséˆ¥? /* not debugging: nothing */
 #endif
 
 
@@ -51,21 +52,13 @@ static int PWM_nr_devs = 4;//
 static struct cdev *PWM_cdev;  
 static struct class *PWM_class;
 static struct device *PWM_device[4];
-//static unsigned int PWM_pin[] = {S3C2410_GPB(0),S3C2410_GPB(1),S3C2410_GPB(2),
-//	S3C2410_GPB(3)};
 
 
 unsigned long tcon;
 unsigned long tcfg0;
 unsigned long tcfg1;
-unsigned long tcnt0;
-unsigned long tcnt1;
-unsigned long tcnt2;
-unsigned long tcnt3;
-unsigned long tcmp0;
-unsigned long tcmp1;
-unsigned long tcmp2;
-unsigned long tcmp3;
+unsigned long tcnt[4];
+unsigned long tcmp[4];
 
 
 module_param(PWM_major,int,S_IRUGO);
@@ -74,14 +67,14 @@ static void __exit PWM_exit(void);
 static int __init PWM_init(void);
 static int PWM_open(struct inode *inode, struct file *file);
 static int PWM_close(struct inode *inode, struct file *file);
-//static long PWM_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
-
+static long PWM_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
+static void set_timer(unsigned int count,unsigned int dat,unsigned int arg);
 
 struct file_operations PWM_fops =
 {
 	.owner = THIS_MODULE,
 	.open = PWM_open,
-//	.unlocked_ioctl = PWM_ioctl,
+	.unlocked_ioctl = PWM_ioctl,
 	.release = PWM_close
 };
 
@@ -100,30 +93,32 @@ static int PWM_open(struct inode *inode, struct file *file)
 	tcfg0 = __raw_readl(S3C2410_TCFG0); 
 	tcfg1 = __raw_readl(S3C2410_TCFG1); 
 	
-	//ÉèÖÃTCFG0¼Ä´æÆ÷£¬prescaler = 50
+	//è®¾ç½®TCFG0å¯„å­˜å™¨ï¼Œprescaler = 50
 	//Timer input clock Frequency = PCLK / {prescaler value+1} / {divider value}
-	tcfg0 &= ~S3C2410_TCFG_PRESCALER0_MASK; // S3C2410_TCFG_PRESCALER0_MASK ¶¨Ê±Æ÷ 0 ºÍ1 µÄÔ¤·ÖÆµÖµµÄÑÚÂë,Çå³ýTCFG[0~8]
-    tcfg0 |= (100 - 1); // ÉèÖÃÔ¤·ÖÆµÎª 50
-    tcfg0 &= ~S3C2410_TCFG_PRESCALER1_MASK; // S3C2410_TCFG_PRESCALER0_MASK ¶¨Ê±Æ÷ 2 3 4 µÄÔ¤·ÖÆµÖµµÄÑÚÂë,Çå³ýTCFG[0~8]
-	tcfg0 |= (100 - 1) << 8; // ÉèÖÃÔ¤·ÖÆµÎª 50
+	tcfg0 &= ~S3C2410_TCFG_PRESCALER0_MASK; // S3C2410_TCFG_PRESCALER0_MASK å®šæ—¶å™¨ 0 å’Œ1 çš„é¢„åˆ†é¢‘å€¼çš„æŽ©ç ,æ¸…é™¤TCFG[0~8]
+    tcfg0 |= (100 - 1); // è®¾ç½®é¢„åˆ†é¢‘ä¸º 50
+    tcfg0 &= ~S3C2410_TCFG_PRESCALER1_MASK; // S3C2410_TCFG_PRESCALER0_MASK å®šæ—¶å™¨ 2 3 4 çš„é¢„åˆ†é¢‘å€¼çš„æŽ©ç ,æ¸…é™¤TCFG[0~8]
+	tcfg0 |= (100 - 1) << 8; // è®¾ç½®é¢„åˆ†é¢‘ä¸º 50
 
 	tcfg1 &= ~(S3C2410_TCFG1_MUX0_MASK | S3C2410_TCFG1_MUX1_MASK | S3C2410_TCFG1_MUX2_MASK
 				| S3C2410_TCFG1_MUX3_MASK);
 	tcfg1 |= S3C2410_TCFG1_MUX0_DIV16 | S3C2410_TCFG1_MUX1_DIV16 | S3C2410_TCFG1_MUX2_DIV16
 				| S3C2410_TCFG1_MUX3_DIV16;
 	
-	__raw_writel(tcfg1, S3C2410_TCFG1); //°Ñ tcfg1 µÄÖµÐ´µ½·Ö¸î¼Ä´æÆ÷ S3C2410_TCFG1 ÖÐ
-	__raw_writel(tcfg0, S3C2410_TCFG0); //°Ñ tcfg0 µÄÖµÐ´µ½Ô¤·ÖÆµ¼Ä´æÆ÷ S3C2410_TCFG0 ÖÐ
+	__raw_writel(tcfg1, S3C2410_TCFG1); //æŠŠ tcfg1 çš„å€¼å†™åˆ°åˆ†å‰²å¯„å­˜å™¨ S3C2410_TCFG1 ä¸­
+	__raw_writel(tcfg0, S3C2410_TCFG0); //æŠŠ tcfg0 çš„å€¼å†™åˆ°é¢„åˆ†é¢‘å¯„å­˜å™¨ S3C2410_TCFG0 ä¸­
 
-	clk_p = clk_get(NULL, "pclk"); //µÃµ½ pclk
+	clk_p = clk_get(NULL, "pclk"); //å¾—åˆ° pclk
 	pclk  = clk_get_rate(clk_p);
 	PDEBUG("plck %ld \n",pclk);
-	tcnt0 = (pclk/100/16)/1;
-	tcmp0 = tcnt0/2;;//tcnt0/2; 
-	__raw_writel(tcnt0, S3C2410_TCNTB(0)); __raw_writel(tcnt0, S3C2410_TCMPB(0));
-	__raw_writel(tcnt0, S3C2410_TCNTB(1)); __raw_writel(tcmp0, S3C2410_TCMPB(1));
-	__raw_writel(tcnt0, S3C2410_TCNTB(2)); __raw_writel(tcmp0, S3C2410_TCMPB(2));
-	__raw_writel(tcnt0, S3C2410_TCNTB(3)); __raw_writel(tcmp0, S3C2410_TCMPB(3));
+	tcnt[0] = (pclk/100/16)/1;
+	tcmp[0] = tcnt[0]/2;
+    tcnt[3] = tcnt[2] = tcnt[1] = tcnt[0];
+    tcmp[3] = tcmp[2] = tcmp[1] = tcmp[0];
+	__raw_writel(tcnt[0], S3C2410_TCNTB(0)); __raw_writel(tcmp[0], S3C2410_TCMPB(0));//tcnt[0]  tcmp[0] 4000
+	__raw_writel(tcnt[0], S3C2410_TCNTB(1)); __raw_writel(tcmp[0], S3C2410_TCMPB(1));
+	__raw_writel(tcnt[0], S3C2410_TCNTB(2)); __raw_writel(tcmp[0], S3C2410_TCMPB(2));
+	__raw_writel(tcnt[0], S3C2410_TCNTB(3)); __raw_writel(tcmp[0], S3C2410_TCMPB(3));
 
 	tcon &= ~(S3C2410_TCON_T0DEADZONE | S3C2410_TCON_T0INVERT);
 	tcon |= S3C2410_TCON_T0RELOAD | S3C2410_TCON_T0MANUALUPD |S3C2410_TCON_T0START;
@@ -142,14 +137,87 @@ static int PWM_open(struct inode *inode, struct file *file)
 				S3C2410_TCON_T2MANUALUPD | S3C2410_TCON_T3MANUALUPD);
 	__raw_writel(tcon, S3C2410_TCON);
 	
+    //////////////////////////////////////
+    tcnt[0] = __raw_readl(S3C2410_TCNTB(0));
+    tcmp[0] = __raw_readl(S3C2410_TCMPB(0)); 
+    PDEBUG("Timer %d tcnt %lu tcmp %lu",0,tcnt[0],tcmp[0]);
+    
+    ///////////////////////////////////////
 	return 0;
+
 }
 
+static void set_timer(unsigned int count,unsigned int dat,unsigned int arg)
+{
+    struct clk *clk_p;
+	unsigned long pclk;
+    if(dat == 1)
+    {
+        clk_p = clk_get(NULL, "pclk"); //å¾—åˆ° pclk
+        pclk  = clk_get_rate(clk_p);
+        tcmp[count] = tcnt[count] = (pclk/100/16)/arg;
+        PDEBUG("Timer %d freq arg %d\n",count,arg);
+        PDEBUG("Timer %d tcnt %lu tcmp %lu",count,tcnt[count],tcmp[count]);
+        __raw_writel(tcnt[count], S3C2410_TCNTB(count)); 
+        __raw_writel(tcmp[count], S3C2410_TCMPB(count));  
+        return ;        
+    }
+    tcmp[count] = tcnt[count] * arg / 100;
+    
+    PDEBUG("Timer %d duty arg %d\n",count,arg);
+    PDEBUG("Timer %d tcnt %lu tcmp %lu",count,tcnt[count],tcmp[count]);
+    __raw_writel(tcmp[count], S3C2410_TCMPB(count)); 
+    
+}
 
+static long PWM_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+	int err = 0;
+	long retval = 0;
+	/*	 
+	* extract the type and number bitfields, and don't decode	 
+	* wrong cmds: return ENOTTY (inappropriate ioctl) before access_ok()	 
+	*/	
+	if (_IOC_TYPE(cmd) != PWM_IOC_MAGIC) return -ENOTTY;	
+	if (_IOC_NR(cmd) > PWM_IOC_MAXNR) return -ENOTTY;	
+	/*	 
+	* the direction is a bitmask, and VERIFY_WRITE catches R/W	 
+	* transfers. `Type' is user-oriented, while	 
+	* access_ok is kernel-oriented, so the concept of "read" and	 
+	* "write" is reversed	 */	
+	if (_IOC_DIR(cmd) & _IOC_READ)		
+		err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));	
+	else if (_IOC_DIR(cmd) & _IOC_WRITE)		
+		err =  !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));	
+	if (err) 
+		return -EFAULT;		
+	switch(cmd)	
+	{	
+	case PWM_IOC_RESET:	
+		break;	
+	case PWM_IOC_SET_TIME0_FREQ:set_timer(0,1,arg);
+		break;	
+	case PWM_IOC_SET_TIME0_DUTY:set_timer(0,0,arg);		
+		break;	
+	case PWM_IOC_SET_TIME1_FREQ:set_timer(1,1,arg);		
+		break;	
+	case PWM_IOC_SET_TIME1_DUTY:set_timer(1,0,arg);		
+		break;		
+	case PWM_IOC_SET_TIME2_FREQ:set_timer(2,1,arg);		
+		break;	
+	case PWM_IOC_SET_TIME2_DUTY:set_timer(2,0,arg);		
+		break;		
+	case PWM_IOC_SET_TIME3_FREQ:set_timer(3,1,arg);		
+		break;	
+	case PWM_IOC_SET_TIME3_DUTY:set_timer(3,0,arg);		
+		break;		
+	default:return -ENOTTY;	
+	}	
+	return retval;
+}
 
 static int PWM_close(struct inode *inode, struct file *file)
 {
-    
 	s3c2410_gpio_cfgpin(S3C2410_GPB(0), S3C2410_GPIO_OUTPUT);
 	s3c2410_gpio_setpin(S3C2410_GPB(0), 1); 
 	s3c2410_gpio_cfgpin(S3C2410_GPB(1), S3C2410_GPIO_OUTPUT);
