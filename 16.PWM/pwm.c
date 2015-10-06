@@ -137,12 +137,6 @@ static int PWM_open(struct inode *inode, struct file *file)
 				S3C2410_TCON_T2MANUALUPD | S3C2410_TCON_T3MANUALUPD);
 	__raw_writel(tcon, S3C2410_TCON);
 	
-    //////////////////////////////////////
-    tcnt[0] = __raw_readl(S3C2410_TCNTB(0));
-    tcmp[0] = __raw_readl(S3C2410_TCMPB(0)); 
-    PDEBUG("Timer %d tcnt %lu tcmp %lu",0,tcnt[0],tcmp[0]);
-    
-    ///////////////////////////////////////
 	return 0;
 
 }
@@ -155,19 +149,58 @@ static void set_timer(unsigned int count,unsigned int dat,unsigned int arg)
     {
         clk_p = clk_get(NULL, "pclk"); //得到 pclk
         pclk  = clk_get_rate(clk_p);
-        tcmp[count] = tcnt[count] = (pclk/100/16)/arg;
-        PDEBUG("Timer %d freq arg %d\n",count,arg);
-        PDEBUG("Timer %d tcnt %lu tcmp %lu",count,tcnt[count],tcmp[count]);
+        tcnt[count] = (pclk/100/16)/arg;
         __raw_writel(tcnt[count], S3C2410_TCNTB(count)); 
-        __raw_writel(tcmp[count], S3C2410_TCMPB(count));  
+        __raw_writel(tcnt[count] >> 1, S3C2410_TCMPB(count));  
         return ;        
     }
     tcmp[count] = tcnt[count] * arg / 100;
-    
-    PDEBUG("Timer %d duty arg %d\n",count,arg);
-    PDEBUG("Timer %d tcnt %lu tcmp %lu",count,tcnt[count],tcmp[count]);
     __raw_writel(tcmp[count], S3C2410_TCMPB(count)); 
     
+    if(arg >= 100 || arg == 0)
+    {
+        switch(count)
+        {
+        case 0: if(!arg)tcon |= S3C2410_TCON_T0INVERT;
+                else tcon &= ~(S3C2410_TCON_T0INVERT);
+                tcon &= ~(S3C2410_TCON_T0RELOAD); __raw_writel(tcon, S3C2410_TCON);
+                break;
+        case 1: if(!arg)tcon |= S3C2410_TCON_T1INVERT;
+                else tcon &= ~(S3C2410_TCON_T1INVERT);
+                tcon &= ~(S3C2410_TCON_T1RELOAD); __raw_writel(tcon, S3C2410_TCON);
+                break;
+        case 2: if(!arg)tcon |= S3C2410_TCON_T2INVERT;
+                else tcon &= ~(S3C2410_TCON_T2INVERT);
+                tcon &= ~(S3C2410_TCON_T2RELOAD); __raw_writel(tcon, S3C2410_TCON);
+                break;
+        case 3: if(!arg)tcon |= S3C2410_TCON_T3INVERT;
+                else tcon &= ~(S3C2410_TCON_T3INVERT);
+                tcon &= ~(S3C2410_TCON_T3RELOAD); __raw_writel(tcon, S3C2410_TCON);
+                break;
+        default:break;
+        }
+    }
+    else
+    {
+        switch(count)
+        {
+        case 0: tcon &= ~S3C2410_TCON_T0INVERT; 
+                tcon |= S3C2410_TCON_T0RELOAD; __raw_writel(tcon, S3C2410_TCON);
+                break;
+        case 1: tcon &= ~S3C2410_TCON_T1INVERT; 
+                tcon |= S3C2410_TCON_T1RELOAD; __raw_writel(tcon, S3C2410_TCON);
+                break;
+        case 2: tcon &= ~S3C2410_TCON_T2INVERT; 
+                tcon |= S3C2410_TCON_T2RELOAD; __raw_writel(tcon, S3C2410_TCON);
+                break;
+        case 3: tcon &= ~S3C2410_TCON_T3INVERT; 
+                tcon |= S3C2410_TCON_T3RELOAD; __raw_writel(tcon, S3C2410_TCON);
+                break;
+        default:break;
+        } 
+    }    
+    tcon = __raw_readl(S3C2410_TCON);
+    PDEBUG("tcon 0x%08lx \n",tcon);
 }
 
 static long PWM_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
