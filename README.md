@@ -41,6 +41,8 @@
 
 16.PWM 产生PWM
 
+17.close_beep 只配置IO
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -61,6 +63,7 @@
 * 2015.9.29 添加 14.button_debounce
 * 2015.10.2 添加 15.button_long_press
 * 2015.10.3 添加 16.PWM
+* 2015.10.7 添加 17.close_beep
 
 ####相关链接及反馈
 
