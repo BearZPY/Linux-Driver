@@ -43,6 +43,8 @@
 
 17.close_beep 只配置IO
 
+18.platform 虚拟总线
+
 ####更新历史
 * 2015.9.2 添加 1.first_drv 
 * 2015.9.3 添加 2.module_param 
@@ -64,6 +66,8 @@
 * 2015.10.2 添加 15.button_long_press
 * 2015.10.3 添加 16.PWM
 * 2015.10.7 添加 17.close_beep
+* 2015.10.9 添加 18.platform
+
 
 ####相关链接及反馈
 
